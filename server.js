@@ -17,6 +17,12 @@ if (process.env.NODE_ENV === "development") {
 //ROUTES MOUNT
 app.use("/api/v1/categories", router);
 
+app.all("*", (req, res,next) => {
+  // CREATE error and send it to the error handling middleware
+  const err = new Error(`Cannot find this route ${req.originalUrl}`);
+  next(err.message);
+})
+
 // GOLABLE ERROR HANDLING MIDDLEWARE
 app.use((err, req, res, next) => {
   res.status(400).json({ err });
