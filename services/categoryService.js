@@ -10,13 +10,11 @@ exports.getCategories = expressAsyncHandler(async (req, res) => {
   res.status(200).json({ results: categories.length, page, data: categories });
 });
 
-exports.getCategoryById = expressAsyncHandler(async (req, res) => {
+exports.getCategoryById = expressAsyncHandler(async (req, res, next) => {
   const id = req.params.id;
   const category = await CategoryModel.findById(id);
   if (!category)
-    return res
-      .status(404)
-      .json({ message: `Category not found for this id: ${id}` });
+    return next(new ApiError(`No category for this id ${id}`, 404));
 
   res.status(200).json({ data: category });
 });

@@ -5,6 +5,8 @@ const morgan = require("morgan");
 dotenv.config({ path: "config.env" });
 const dbConnection = require("./config/database");
 const router = require("./routes/categoryRoute");
+const ApiError = require("./utils/apiError");
+const globalError = require("./middlewares/errorMiddleware");
 
 dbConnection();
 const app = express();
@@ -18,15 +20,11 @@ if (process.env.NODE_ENV === "development") {
 app.use("/api/v1/categories", router);
 
 app.all("*", (req, res,next) => {
-  // CREATE error and send it to the error handling middleware
-  const err = new Error(`Cannot find this route ${req.originalUrl}`);
-  next(err.message);
+  next(new ApiError(`Can't find this route: ${req.originalUrl}`, 400));
 })
 
 // GOLABLE ERROR HANDLING MIDDLEWARE
-app.use((err, req, res, next) => {
-  res.status(400).json({ err });
-});
+app.use(globalError);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
